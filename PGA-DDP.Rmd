@@ -1,0 +1,102 @@
+---
+title: "mtcars Dataset Analysis"
+author: "Adithyaa Sunder"
+date: "06.11.2020"
+output:
+  slidy_presentation: default
+  html_document:
+    number_sections: yes
+    toc: yes
+  ioslides_presentation: default
+mode: selfcontained
+job: Reproducible Pitch Presentation
+subtitle: Variables and MPG
+highlighter: highlight.js
+widgets: bootstrap
+---
+
+## Coursera Reproducible Pitch
+
+### Have a look at the Regression Models Course Project 
+
+- URL: *https://github.com/adithyaa98/Developing-Data-Products-PGA3*
+
+### Find the details of the project here
+
+URL: *https://www.coursera.org/learn/data-products/peer/tMYrn/course-project-shiny-application-and-reproducible-pitch*
+
+---
+
+## Dataset
+
+### Motor Trend Car Road Tests
+
+> The data was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973-74 models).
+
+### Sources Cited
+
+> Henderson and Velleman (1981), Building multiple regression models interactively. Biometrics, 37, 391-411.
+
+```{r}
+library(datasets)
+head(mtcars, 3)
+```
+---
+
+## mtcars Dataset - Format
+
+**A data frame with 11 variables and 32 observations.**
+
+| Index | Field | Detail |
+------- | ----- | ------ |
+| [, 1] | mpg | Miles/(US) gallon |
+| [, 2]  | cyl | Number of cylinders |
+| [, 3]	| disp | Displacement (cu.in.) |
+| [, 4]	| hp | Gross horsepower |
+| [, 5]	| drat | Rear axle ratio |
+| [, 6]	| wt | Weight (lb/1000) |
+| [, 7]	| qsec | 1/4 mile time |
+| [, 8]	| vs | V/S |
+| [, 9]	| am | Transmission (0 = automatic, 1 = manual) |
+| [,10]	| gear | Number of forward gears |
+| [,11]	| carb | Number of carburetors |
+
+---
+
+## Analysis - Main Code
+
+```r
+ formulaText <- reactive({
+        paste("mpg ~", input$variable)
+    }) ### Formula Text
+    
+    formulaTextPoint <- reactive({
+        paste("mpg ~", "as.integer(", input$variable, ")")
+    }) ### Formula Text Point
+    
+    fit <- reactive({
+        lm(as.formula(formulaTextPoint()), data=mpgCarsData)
+    }) ### Fitting
+    
+    output$caption <- renderText({
+        formulaText()
+    }) ### Output Caption
+    
+    output$mpgBoxPlot <- renderPlot({
+        boxplot(as.formula(formulaText()), 
+                data = mpgCarsData,
+                outline = input$outliers)
+    }) ### Box Plot
+    
+    output$fit <- renderPrint({
+        summary(fit())
+    }) ### Summary
+    
+    output$mpgPlot <- renderPlot({
+        with(mpgCarsData, {
+            plot(as.formula(formulaTextPoint()))
+            abline(fit(), col=2)
+        }) ### Render Plot
+    })
+    
+```
